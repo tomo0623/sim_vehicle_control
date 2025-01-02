@@ -6,6 +6,7 @@
 #include <vector>
 #include <array>
 
+#include <armadillo>
 #include "Eigen/Dense"
 #include "param.h"
 
@@ -17,6 +18,8 @@ private:
 
 public:
 	Eigen::VectorXd u = Eigen::VectorXd::Zero(kNumInputU); // 入力ベクトル
+	arma::vec xp; // 目標軌道列X
+	arma::vec yp; // 目標軌道列Y
 
 	// コンストラクタ
 	Controller(Eigen::VectorXd u0)
@@ -42,5 +45,9 @@ public:
 	{
 		return u;
 	}
+
+	// 疑似Planner
+	void PseudoPlanner();
+
 };
 #endif // _CONTROLLER_H_

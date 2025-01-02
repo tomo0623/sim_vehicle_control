@@ -5,6 +5,7 @@
 #include <vector>
 #include <array>
 
+#include <armadillo>
 #include "Eigen/Dense"
 
 #include "param.h"
@@ -14,6 +15,25 @@
 // 暫定のデバッグ用グローバル変数（注意）
 extern double g_dbg_info[15];
 
+// 疑似Planner関数
+void Controller::PseudoPlanner()
+{
+	xp = arma::regspace(0,10,2000);
+	yp = arma::ones(size(xp))*5.0; // 直線軌道
+	// yp = arma::sin(xp/100-0)*30.0; // sinカーブ軌道
+
+	// std::cout<<xp<<std::endl;
+	// std::cout<<yp<<std::endl;
+	return;
+}
+
+// 偏差パラメータ計算関数
+Eigen::VectorXd CalcErrorParam()
+{
+	Eigen::VectorXd err_param = Eigen::VectorXd::Zero(4);
+
+	
+}
 // 制御入力計算関数
 // x = [posx, posy, theta]^T
 // u = [delta, ref_posx, ref_posy, tracking_error]^T
