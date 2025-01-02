@@ -90,18 +90,19 @@ void Simulator(Method f, OEQ h, std::string filename)
 //------------------------------------------------------------------------
 int main(void)
 {
-	// std::string filename = "simout.csv";
+	std::string filename = "simout.csv";
 
-	// // RK4シミュレーション
-	// Simulator(RungeKutta<Dynamics::StateEquation>(kSmplTimeSim), Dynamics::OutputEquation(), filename);
-	// std::cout << "シミュレーション実行完了" << std::endl;
+	// RK4シミュレーション
+	Simulator(RungeKutta<Dynamics::StateEquation>(kSmplTimeSim), Dynamics::OutputEquation(), filename);
+	std::cout << "シミュレーション実行完了" << std::endl;
 
-	// // グラフプロット(python matplotlib流用)
-	// std::cout << "グラフプロット (python matplotlib流用)" << std::endl;
-	// python_graph_plotter(filename);
+	// グラフプロット(python matplotlib流用)
+	std::cout << "グラフプロット (python matplotlib流用)" << std::endl;
+	python_graph_plotter(filename);
 
-	// std::cout << "全処理完了" << std::endl;
-	Controller Ctrl;
-	Ctrl.PseudoPlanner();
+	std::cout << "全処理完了" << std::endl;
+
+	// Controller Ctrl;
+	// Ctrl.PseudoPlanner();
 
 }

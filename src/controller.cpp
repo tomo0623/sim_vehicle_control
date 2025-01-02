@@ -20,20 +20,22 @@ void Controller::PseudoPlanner()
 {
 	xp = arma::regspace(0,10,2000);
 	yp = arma::ones(size(xp))*5.0; // 直線軌道
-	// yp = arma::sin(xp/100-0)*30.0; // sinカーブ軌道
+	// yp = arma::sin(xp/100-0)*5.0+5.0; // sinカーブ軌道
 
 	// std::cout<<xp<<std::endl;
 	// std::cout<<yp<<std::endl;
 	return;
 }
 
-// 偏差パラメータ計算関数
-Eigen::VectorXd CalcErrorParam()
-{
-	Eigen::VectorXd err_param = Eigen::VectorXd::Zero(4);
+// // 偏差パラメータ計算関数
+// Eigen::VectorXd CalcErrorParam()
+// {
+// 	Eigen::VectorXd err_param = Eigen::VectorXd::Zero(4);
 
-	
-}
+// 	return err_param;
+// }
+
+
 // 制御入力計算関数
 // x = [posx, posy, theta]^T
 // u = [delta, ref_posx, ref_posy, tracking_error]^T
@@ -41,11 +43,52 @@ Eigen::VectorXd CalcErrorParam()
 Eigen::VectorXd Controller::CalcCtrlInput(double t, Eigen::VectorXd y)
 {
 
+	double tracking_err;
+	// 暫定目標軌道
+	Eigen::Vector3d ref_vec;
+	if(0)
+	{
+		// 直線
+		ref_vec(0) = 5.0;
+		ref_vec(1) = 0.0; // 一階微分
+		ref_vec(2) = 0.0; // 二階微分
+	}
+	else
+	{
+		// sinカーブ
+		ref_vec(0) = 5.0*sin(y(0)/100.0)+5.0;
+		ref_vec(1) = 5.0*cos(y(0)/100.0)/100.0; // 一階微分
+		ref_vec(2) = -5.0*sin(y(0)/100.0)/100.0/100.0; // 二階微分
+	}
+	
+
+	// 制御偏差
+	tracking_err = ref_vec(0) - y(1);
+
 	// 制御入力設定
-	u(0) = 5. / kR2D;
-	u(1) = 0.;
-	u(2) = 0.;
-	u(3) = 0.;
+	if(0)
+	{
+		// PID
+		u(0) = tracking_err;
+		u(1) = y(0);
+		u(2) = ref_vec(0);
+		u(3) = tracking_err;
+	}
+	else
+	{
+		// TSCF
+		double omega = 0.1;
+		double zeta = 1.0;
+
+		double f1 = 2.0*zeta*omega;
+        double f2 = omega*omega;
+		double eta = ref_vec(2) - f1*(tan(y(2))-ref_vec(1)) - f2*(y(1)-ref_vec(0));
+
+		u(0) = atan2(kWheelBase*eta*cos(y(2))*cos(y(2))*cos(y(2)),1);
+		u(1) = y(0);
+		u(2) = ref_vec(0);
+		u(3) = tracking_err;
+	}
 
 	// デバッグ情報の仮取得
 	g_dbg_info[0] = 0.;
