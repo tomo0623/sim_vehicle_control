@@ -69,6 +69,7 @@ Eigen::VectorXd Dynamics::OutputEquation::CalcOEQ(double t, Eigen::VectorXd x, E
     y(x.size()) = car.speed * cos(x(2));
     y(x.size() + 1) = car.speed * sin(x(2));
     y(x.size() + 2) = car.speed / car.wheelbase * tan(steer);
+    y(x.size() + 3) = car.speed;
 
     // std::cout<<"outputs : " << t <<std::endl;
     // std::cout<<y<<std::endl;
