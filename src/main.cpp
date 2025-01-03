@@ -8,6 +8,7 @@
 #include <array>
 #include <string>
 
+#include <armadillo>
 #include "Eigen/Dense"
 
 #include "param.h"
@@ -15,6 +16,9 @@
 #include "dynamics.h"
 #include "controller.h"
 #include "plant_model.h"
+
+#include "FilterCCF.h"
+
 
 // 暫定のデバッグ用グローバル変数（注意）
 double g_dbg_info[15] = {0.};
@@ -92,17 +96,32 @@ int main(void)
 {
 	std::string filename = "simout.csv";
 
-	// RK4シミュレーション
-	Simulator(RungeKutta<Dynamics::StateEquation>(kSmplTimeSim), Dynamics::OutputEquation(), filename);
-	std::cout << "シミュレーション実行完了" << std::endl;
+	// // RK4シミュレーション
+	// Simulator(RungeKutta<Dynamics::StateEquation>(kSmplTimeSim), Dynamics::OutputEquation(), filename);
+	// std::cout << "シミュレーション実行完了" << std::endl;
 
-	// グラフプロット(python matplotlib流用)
-	std::cout << "グラフプロット (python matplotlib流用)" << std::endl;
-	python_graph_plotter(filename);
+	// // グラフプロット(python matplotlib流用)
+	// std::cout << "グラフプロット (python matplotlib流用)" << std::endl;
+	// python_graph_plotter(filename);
 
-	std::cout << "全処理完了" << std::endl;
+	// std::cout << "全処理完了" << std::endl;
+
 
 	// Controller Ctrl;
 	// Ctrl.PseudoPlanner();
+
+	// // フィルタ動作チェック
+	// FilterCCF ADF(0.05, 0.02, 0.01);
+	// arma::vec vec_sin_curve = arma::sin(arma::regspace(0,0.01,10));
+	// Eigen::Vector2d filter_output;
+	// std::ofstream ofs("filter_test.csv");
+	// for(int i=0; i < vec_sin_curve.size(); i++)
+	// {
+	// 	// std::cout << vec_sin_curve[i] << std::endl;
+	// 	filter_output = ADF(vec_sin_curve[i]);
+	// 	ofs << vec_sin_curve[i] << ",";
+	// 	ofs << filter_output[0] << ",";
+	// 	ofs << filter_output[1] << std::endl;
+	// }
 
 }

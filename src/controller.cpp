@@ -12,6 +12,7 @@
 #include "controller.h"
 #include "plant_model.h"
 
+
 // 暫定のデバッグ用グローバル変数（注意）
 extern double g_dbg_info[15];
 

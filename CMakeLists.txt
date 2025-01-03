@@ -11,4 +11,4 @@ add_executable(${CMAKE_PROJECT_NAME}
                 ./matplotlib/python_graph_plotter.cpp)
 
 target_link_libraries(${CMAKE_PROJECT_NAME} Eigen3::Eigen ${Python3_LIBRARIES})
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${Python3_INCLUDE_DIRS} ./matplotlib)
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${Python3_INCLUDE_DIRS} ./matplotlib ./Filter)
