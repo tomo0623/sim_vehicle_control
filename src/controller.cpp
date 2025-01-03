@@ -44,7 +44,7 @@ void Controller::PseudoPlanner()
 Eigen::VectorXd Controller::CalcCtrlInput(double t, Eigen::VectorXd y)
 {
 
-	double tracking_err;
+	double tracking_err = 0., diff_tracking_err = 0.;
 	// 暫定目標軌道
 	Eigen::Vector3d ref_vec;
 	if(0)
@@ -57,9 +57,9 @@ Eigen::VectorXd Controller::CalcCtrlInput(double t, Eigen::VectorXd y)
 	else
 	{
 		// sinカーブ
-		ref_vec(0) = 5.0*sin(y(0)/100.0)+5.0;
-		ref_vec(1) = 5.0*cos(y(0)/100.0)/100.0; // 一階微分
-		ref_vec(2) = -5.0*sin(y(0)/100.0)/100.0/100.0; // 二階微分
+		ref_vec(0) = 5.0*sin(y(0)/20.0)-5.0;
+		ref_vec(1) = 5.0*cos(y(0)/20.0)/20.0; // 一階微分
+		ref_vec(2) = -5.0*sin(y(0)/20.0)/20.0/20.0; // 二階微分
 	}
 	
 
@@ -70,7 +70,9 @@ Eigen::VectorXd Controller::CalcCtrlInput(double t, Eigen::VectorXd y)
 	if(0)
 	{
 		// PID
-		u(0) = tracking_err;
+		Eigen::Vector2d adf_out = ADF(tracking_err);
+		diff_tracking_err = adf_out(1);
+		u(0) = ctrl_param(0)*tracking_err + ctrl_param(1)*diff_tracking_err;
 		u(1) = y(0);
 		u(2) = ref_vec(0);
 		u(3) = tracking_err;

@@ -96,23 +96,24 @@ int main(void)
 {
 	std::string filename = "simout.csv";
 
-	// // RK4シミュレーション
-	// Simulator(RungeKutta<Dynamics::StateEquation>(kSmplTimeSim), Dynamics::OutputEquation(), filename);
-	// std::cout << "シミュレーション実行完了" << std::endl;
+	// RK4シミュレーション
+	Simulator(RungeKutta<Dynamics::StateEquation>(kSmplTimeSim), Dynamics::OutputEquation(), filename);
+	std::cout << "シミュレーション実行完了" << std::endl;
 
-	// // グラフプロット(python matplotlib流用)
-	// std::cout << "グラフプロット (python matplotlib流用)" << std::endl;
-	// python_graph_plotter(filename);
+	// グラフプロット(python matplotlib流用)
+	std::cout << "グラフプロット (python matplotlib流用)" << std::endl;
+	python_graph_plotter(filename);
 
-	// std::cout << "全処理完了" << std::endl;
+	std::cout << "全処理完了" << std::endl;
 
 
+	// 疑似プランナー動作チェック
 	// Controller Ctrl;
 	// Ctrl.PseudoPlanner();
 
 	// // フィルタ動作チェック
 	// FilterCCF ADF(0.05, 0.02, 0.01);
-	// arma::vec vec_sin_curve = arma::sin(arma::regspace(0,0.01,10));
+	// arma::vec vec_sin_curve = arma::sin(arma::regspace(0,0.01,10))*5.0;
 	// Eigen::Vector2d filter_output;
 	// std::ofstream ofs("filter_test.csv");
 	// for(int i=0; i < vec_sin_curve.size(); i++)

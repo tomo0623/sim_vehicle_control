@@ -10,7 +10,7 @@ constexpr double kSmplTimeSim = 0.01;                          // サンプリ�
 constexpr double kSmplTimeCtrl = 0.01;                         // サンプリング時間(制御器)
 constexpr int kNumSimCtrl = int(kSmplTimeCtrl / kSmplTimeSim); // 制御割込カウント周期
 
-constexpr double kMaxSimTime = 100.0;                               // シミュレーション時間
+constexpr double kMaxSimTime = 50.0;                               // シミュレーション時間
 constexpr double kNumMaxSimCount = int(kMaxSimTime / kSmplTimeSim); // シミュレーション時間
 
 constexpr double kR2D = 180. / 3.14159265359;
