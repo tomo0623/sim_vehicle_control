@@ -26,6 +26,58 @@ double g_dbg_info[15] = {0.};
 // 関数プロトタイプ宣言
 int python_graph_plotter(std::string);
 
+// ユーザー設定取得部
+void GetUserSetting(int& user_mode, std::vector<double>& user_param)
+{
+	// 制御モード取得
+	std::cout << "制御モード選択 -> 0:PID-直線追従, 1:PID-SIN追従, 2:TSCF-直線追従, 3:TSCF-SIN追従" << std::endl;
+    std::cin >> user_mode;
+	while(std::cin.fail() || user_mode < 0 || user_mode > 3)
+    {
+		if (std::cin.fail())
+		{
+			std::cin.clear();
+			std::cin.ignore(256, '\n');
+			std::cout << "数値入力してください" << std::endl;
+			std::cin >> user_mode;
+		}
+		else if(user_mode < 0 || user_mode > 3) 
+		{
+			std::cout << "0~3の整数値入力をしてください" << '\n';
+			std::cin >> user_mode;
+		}
+    }
+    std::cout << "制御モード : " << user_mode << std::endl;
+
+	// 制御パラメータ取得
+	if(user_mode<2)
+	{
+		std::cout << "制御パラメータ設定(スペース区切り) -> Pゲイン Dゲイン" << std::endl;
+	}
+	else
+	{
+		std::cout << "制御パラメータ設定(スペース区切り) -> 固有角周波数ω 減衰係数ζ" << std::endl;
+	}
+
+	std::cin >> user_param[0] >> user_param[1];
+	while(std::cin.fail() || user_param[0] < 0 || user_param[1] < 0)
+    {
+		if (std::cin.fail())
+		{
+			std::cin.clear();
+			std::cin.ignore(256, '\n');
+			std::cout << "数値入力してください" << std::endl;
+			std::cin >> user_param[0] >> user_param[1];
+		}
+		else if(user_param[0] < 0 || user_param[1] < 0) 
+		{
+			std::cout << "非負の数値を入力してください" << '\n';
+			std::cin >> user_param[0] >> user_param[1];
+		}
+    }
+	std::cout << "制御パラメータ : " << user_param[0] << "," << user_param[1] << std::endl;
+}
+
 // シミュレーション処理メイン部
 // x = [posx, posy, theta]^T
 // u = [delta, ref_posx, ref_posy, tracking_error]^T
@@ -44,9 +96,15 @@ void Simulator(Method f, OEQ h, std::string filename)
 	Eigen::VectorXd u = Eigen::VectorXd::Zero(kNumInputU);
 	Eigen::VectorXd y = Eigen::VectorXd::Zero(kNumOutputY);
 
-	// 制御器クラス
-	Controller Ctrl(u);
+	// CUIで制御設定変更
+	int user_mode = 0;
+	std::vector<double> user_param(2);
+	GetUserSetting(user_mode, user_param);
 
+	// 制御器クラス
+	Controller Ctrl(u, static_cast<CtrlMode>(user_mode), user_param);
+	// Controller Ctrl(u, static_cast<CtrlMode>(1));
+	
 	// 状態/出力初期化 x0 = [posx, posy, theta]^T
 	x << 0., 0., 0. / kR2D;
 	y = h(t, x, u);

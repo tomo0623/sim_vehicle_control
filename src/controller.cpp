@@ -47,7 +47,7 @@ Eigen::VectorXd Controller::CalcCtrlInput(double t, Eigen::VectorXd y)
 	double tracking_err = 0., diff_tracking_err = 0.;
 	// 暫定目標軌道
 	Eigen::Vector3d ref_vec;
-	if(0)
+	if(mode == PID_LINE || mode == TSCF_LINE)
 	{
 		// 直線
 		ref_vec(0) = 5.0;
@@ -67,7 +67,7 @@ Eigen::VectorXd Controller::CalcCtrlInput(double t, Eigen::VectorXd y)
 	tracking_err = ref_vec(0) - y(1);
 
 	// 制御入力設定
-	if(0)
+	if(mode == PID_LINE || mode == PID_SIN)
 	{
 		// PID
 		Eigen::Vector2d adf_out = ADF(tracking_err);
@@ -80,8 +80,10 @@ Eigen::VectorXd Controller::CalcCtrlInput(double t, Eigen::VectorXd y)
 	else
 	{
 		// TSCF
-		double omega = 0.1;
-		double zeta = 1.0;
+		// double omega = 0.1;
+		// double zeta = 1.0;
+		double omega = ctrl_param(0);
+		double zeta = ctrl_param(1);
 
 		double f1 = 2.0*zeta*omega;
         double f2 = omega*omega;
