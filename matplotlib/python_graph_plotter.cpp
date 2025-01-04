@@ -110,8 +110,8 @@ int python_graph_plotter(std::string filename)
     plt::grid(1);
     plt::subplot(2, 2, 4);
     plt::plot(data_matrix.col(0), data_matrix.col(4));
-    // plt::plot(tmp_time, tmp_str_up,"r--");
-    // plt::plot(tmp_time, tmp_str_lo,"r--");
+    plt::plot(tmp_time, tmp_str_up,"r--");
+    plt::plot(tmp_time, tmp_str_lo,"r--");
     plt::ylabel("steer [rad]");
     plt::xlabel("time [s]");
     plt::grid(1);
@@ -136,8 +136,8 @@ int python_graph_plotter(std::string filename)
     plt::grid(1);
     plt::subplot(2, 2, 4);
     plt::plot(data_matrix.col(0), data_matrix.col(4));
-    // plt::plot(tmp_time, tmp_str_up,"r--");
-    // plt::plot(tmp_time, tmp_str_lo,"r--");
+    plt::plot(tmp_time, tmp_str_up,"r--");
+    plt::plot(tmp_time, tmp_str_lo,"r--");
     plt::ylabel("steer [rad]");
     plt::xlabel("time [s]");
     plt::grid(1);
