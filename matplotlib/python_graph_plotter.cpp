@@ -75,7 +75,7 @@ int python_graph_plotter(std::string filename)
     // std::cout << data_matrix.col(0) << std::endl;
 
     // ステアリミット
-    Eigen::Vector2d tmp_time = {data_matrix(0,0), data_matrix(data_matrix.rows()-1,0)};
+    Eigen::Vector2d tmp_time = {data_matrix(0, 0), data_matrix(data_matrix.rows() - 1, 0)};
     Eigen::Vector2d tmp_str_up = {kLimSteerAngle, kLimSteerAngle};
     Eigen::Vector2d tmp_str_lo = -tmp_str_up;
     // std::cout << data_matrix(data_matrix.rows()-1,0) << std::endl;
@@ -110,8 +110,8 @@ int python_graph_plotter(std::string filename)
     plt::grid(1);
     plt::subplot(2, 2, 4);
     plt::plot(data_matrix.col(0), data_matrix.col(4));
-    plt::plot(tmp_time, tmp_str_up,"r--");
-    plt::plot(tmp_time, tmp_str_lo,"r--");
+    plt::plot(tmp_time, tmp_str_up, "r--");
+    plt::plot(tmp_time, tmp_str_lo, "r--");
     plt::ylabel("steer [rad]");
     plt::xlabel("time [s]");
     plt::grid(1);
@@ -136,8 +136,8 @@ int python_graph_plotter(std::string filename)
     plt::grid(1);
     plt::subplot(2, 2, 4);
     plt::plot(data_matrix.col(0), data_matrix.col(4));
-    plt::plot(tmp_time, tmp_str_up,"r--");
-    plt::plot(tmp_time, tmp_str_lo,"r--");
+    plt::plot(tmp_time, tmp_str_up, "r--");
+    plt::plot(tmp_time, tmp_str_lo, "r--");
     plt::ylabel("steer [rad]");
     plt::xlabel("time [s]");
     plt::grid(1);

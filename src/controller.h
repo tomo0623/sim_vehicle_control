@@ -12,8 +12,9 @@
 
 #include "FilterCCF.h"
 
-// 
-enum CtrlMode {
+//
+enum CtrlMode
+{
 	PID_LINE,
 	PID_SIN,
 	TSCF_LINE,
@@ -29,14 +30,13 @@ private:
 public:
 	Eigen::Vector2d ctrl_param = Eigen::VectorXd::Zero(2); // 制御パラメータ
 	Eigen::VectorXd u = Eigen::VectorXd::Zero(kNumInputU); // 入力ベクトル
-	arma::vec xp; // 目標軌道列X
-	arma::vec yp; // 目標軌道列Y
+	arma::vec xp;										   // 目標軌道列X
+	arma::vec yp;										   // 目標軌道列Y
 	FilterCCF ADF;
 	enum CtrlMode mode;
-	
 
 	// コンストラクタ
-	Controller(Eigen::VectorXd u0, CtrlMode user_mode = PID_LINE, std::vector<double> user_param = {0.,0.})
+	Controller(Eigen::VectorXd u0, CtrlMode user_mode = PID_LINE, std::vector<double> user_param = {0., 0.})
 	{
 		u = u0;
 
@@ -47,7 +47,6 @@ public:
 		// ctrl_param(0) = 0.0001; // PID仮調整
 		// ctrl_param(1) = 0.01; // PID仮調整
 		std::cout << "ctrl param : " << ctrl_param.transpose() << std::endl;
-		
 	}
 	Controller()
 	{
@@ -77,6 +76,5 @@ public:
 	{
 		ctrl_param = user_param;
 	}
-
 };
 #endif // _CONTROLLER_H_
