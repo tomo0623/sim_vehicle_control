@@ -17,14 +17,55 @@ extern double g_dbg_info[15];
 
 // 関数プロトタイプ宣言
 void NNS(arma::vec, arma::vec, double, double, Eigen::VectorXd &);
+std::vector<std::string> split(std::string &line, char delimiter);
+template <class S>
+Eigen ::Matrix<S, Eigen ::Dynamic, Eigen ::Dynamic>
+vector2matrix(const std ::vector<std ::vector<S>> &in);
 
 // 疑似Planner関数
 void Controller::PseudoPlanner()
 {
-	xp = arma::regspace(0, 5, 2000);
-	// yp = arma::ones(size(xp)) * 5.0; // 直線軌道
-	yp = arma::sin(xp / 20 - 0) * 5.0 - 5.0; // sinカーブ軌道
+	if(0)
+	{
+		// 関数で生成
+		xp = arma::regspace(0, 5, 2000);
+		// yp = arma::ones(size(xp)) * 5.0; // 直線軌道
+		yp = arma::sin(xp / 20 - 0) * 5.0 - 5.0; // sinカーブ軌道
+	}
+	else
+	{
+		// CSV読み込み
+		std::vector<std::vector<double>> data;
+		std::ifstream ifs("../src/ref_trajectory.csv");
 
+		if (ifs)
+		{
+			std::string line;
+
+			// 一行目がラベルの場合
+			// getline(ifs, line);
+			// std::vector<std::string> str_vec = split(line, ',');
+
+			while (getline(ifs, line))
+			{
+				std::vector<double> data_vec;
+				std::vector<std::string> str_vec = split(line, ',');
+				for (auto &&s : str_vec)
+				{
+					data_vec.push_back(std::stod(s));
+				}
+				data.push_back(data_vec);
+			}
+		}
+
+		// Eigen行列に差し替え
+		Eigen::MatrixXd data_matrix = vector2matrix(data);
+
+		// armadilloベクトルに変換
+		xp = arma::vec(data_matrix.col(0).data(), data_matrix.rows(), true, false);
+		yp = arma::vec(data_matrix.col(1).data(), data_matrix.rows(), true, false);
+	}
+	
 	// std::cout<<xp<<std::endl;
 	// std::cout<<yp<<std::endl;
 	return;
@@ -209,4 +250,6 @@ Eigen::VectorXd Controller::CalcCtrlInput(double t, Eigen::VectorXd y)
 	// std::cout<<"control : " << t <<std::endl;
 	// std::cout<<u<<std::endl;
 	return u;
+
+	// u(0) = (cos(t/2)*kLimSteerAngle/3)*sin(t/5); // ダミー軌道生成用
 }

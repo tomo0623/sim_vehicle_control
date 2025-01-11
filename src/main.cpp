@@ -151,17 +151,17 @@ void Simulator(Method f, OEQ h, std::string filename)
 //------------------------------------------------------------------------
 int main(void)
 {
-	// std::string filename = "simout.csv";
+	std::string filename = "simout.csv";
 
-	// // RK4シミュレーション
-	// Simulator(RungeKutta<Dynamics::StateEquation>(kSmplTimeSim), Dynamics::OutputEquation(), filename);
-	// std::cout << "シミュレーション実行完了" << std::endl;
+	// RK4シミュレーション
+	Simulator(RungeKutta<Dynamics::StateEquation>(kSmplTimeSim), Dynamics::OutputEquation(), filename);
+	std::cout << "シミュレーション実行完了" << std::endl;
 
-	// // グラフプロット(python matplotlib流用)
-	// std::cout << "グラフプロット (python matplotlib流用)" << std::endl;
-	// python_graph_plotter(filename);
+	// グラフプロット(python matplotlib流用)
+	std::cout << "グラフプロット (python matplotlib流用)" << std::endl;
+	python_graph_plotter(filename);
 
-	// std::cout << "全処理完了" << std::endl;
+	std::cout << "全処理完了" << std::endl;
 
 	// // フィルタ動作チェック
 	// FilterCCF ADF(0.05, 0.02, 0.01);
@@ -184,21 +184,21 @@ int main(void)
 	// NNS(xp, yp, 4.05, 1.2, outNNS);
 	// std::cout << outNNS << std::endl;
 
-	// 疑似プランナー -> 軌道&参照パラメータ計算の動作チェック
-	Controller Ctrl;
-	Ctrl.PseudoPlanner();
-	Ctrl.CalcTrajectoryParams();
-	Ctrl.CalcReferenceParams(40.05, 1.2);
+	// // 疑似プランナー -> 軌道&参照パラメータ計算の動作チェック
+	// Controller Ctrl;
+	// Ctrl.PseudoPlanner();
+	// Ctrl.CalcTrajectoryParams();
+	// Ctrl.CalcReferenceParams(40.05, 1.2);
 
-	std::ofstream ofs("plan-ctrl_test.csv");
-	for (int i = 0; i < Ctrl.xp.size(); i++)
-	{
-		ofs << Ctrl.xp(i) << ",";
-		ofs << Ctrl.yp(i) << ",";
-		ofs << Ctrl.length(i) << ",";
-		ofs << Ctrl.angle(i) << ",";
-		ofs << Ctrl.curvature(i) << std::endl;
-	}
+	// std::ofstream ofs("plan-ctrl_test.csv");
+	// for (int i = 0; i < Ctrl.xp.size(); i++)
+	// {
+	// 	ofs << Ctrl.xp(i) << ",";
+	// 	ofs << Ctrl.yp(i) << ",";
+	// 	ofs << Ctrl.length(i) << ",";
+	// 	ofs << Ctrl.angle(i) << ",";
+	// 	ofs << Ctrl.curvature(i) << std::endl;
+	// }
 
 	return 0;
 }
