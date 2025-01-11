@@ -32,6 +32,11 @@ public:
 	Eigen::VectorXd u = Eigen::VectorXd::Zero(kNumInputU); // 入力ベクトル
 	arma::vec xp;										   // 目標軌道列X
 	arma::vec yp;										   // 目標軌道列Y
+	arma::vec curvature;								   // 目標軌道曲率
+	arma::vec angle;									   // 目標軌道方向角
+	arma::vec length;									   // 目標軌道累積距離
+	Eigen::VectorXd outNNS = Eigen::VectorXd::Zero(5);	   // 最近傍点探索パラメータ(最近傍補間参照点との偏差, 最近傍補間IDX, 直行条件, ベクトル方向確認, reserve)
+	Eigen::VectorXd ref_param = Eigen::VectorXd::Zero(6);  // 最近傍点参照パラメータ(偏差, 方向角, 曲率, 累積距離, 参照座標X, 参照座標Y)
 	FilterCCF ADF;
 	enum CtrlMode mode;
 
@@ -70,6 +75,12 @@ public:
 
 	// 疑似Planner
 	void PseudoPlanner();
+
+	// 軌道パラメータ計算
+	void CalcTrajectoryParams();
+
+	// 参照パラメータ計算
+	void CalcReferenceParams(const double, const double);
 
 	// 制御パラメータ設定
 	void SetCtrlParam(Eigen::Vector2d user_param)

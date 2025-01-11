@@ -15,25 +15,122 @@
 // 暫定のデバッグ用グローバル変数（注意）
 extern double g_dbg_info[15];
 
+// 関数プロトタイプ宣言
+void NNS(arma::vec, arma::vec, double, double, Eigen::VectorXd &);
+
 // 疑似Planner関数
 void Controller::PseudoPlanner()
 {
-	xp = arma::regspace(0, 10, 2000);
-	yp = arma::ones(size(xp)) * 5.0; // 直線軌道
-	// yp = arma::sin(xp/100-0)*5.0+5.0; // sinカーブ軌道
+	xp = arma::regspace(0, 5, 2000);
+	// yp = arma::ones(size(xp)) * 5.0; // 直線軌道
+	yp = arma::sin(xp / 20 - 0) * 5.0 - 5.0; // sinカーブ軌道
 
 	// std::cout<<xp<<std::endl;
 	// std::cout<<yp<<std::endl;
 	return;
 }
 
-// // 偏差パラメータ計算関数
-// Eigen::VectorXd CalcErrorParam()
-// {
-// 	Eigen::VectorXd err_param = Eigen::VectorXd::Zero(4);
+// 軌道パラメータ計算
+void Controller::CalcTrajectoryParams()
+{
+	// 目標軌道の各ベクトルの1階/2階微分の計算(diff取る前に要素コピーでvec拡大)
+	arma::vec x = xp;
+	arma::vec y = yp;
+	arma::vec dx = arma::diff(x);
+	arma::vec dy = arma::diff(y);
+	if (1)
+	{
+		// 後方拡張
+		dx.insert_rows(dx.size(), 1);
+		dx(dx.size() - 1) = dx(dx.size() - 2);
+		dy.insert_rows(dy.size(), 1);
+		dy(dy.size() - 1) = dy(dy.size() - 2);
+	}
+	else
+	{
+		// 前方拡張
+		dx.insert_rows(0, 1);
+		dx(0) = dx(1);
+		dy.insert_rows(0, 1);
+		dy(0) = dy(1);
+	}
+	arma::vec dx2 = arma::diff(dx);
+	arma::vec dy2 = arma::diff(dy);
+	if (1)
+	{
+		// 後方拡張
+		dx2.insert_rows(dx2.size(), 1);
+		dx2(dx2.size() - 1) = dx2(dx2.size() - 2);
+		dy2.insert_rows(dy2.size(), 1);
+		dy2(dy2.size() - 1) = dy2(dy2.size() - 2);
+	}
+	else
+	{
+		// 前方拡張
+		dx2.insert_rows(0, 1);
+		dx2(0) = dx2(1);
+		dy2.insert_rows(0, 1);
+		dy2(0) = dy2(1);
+	}
 
-// 	return err_param;
-// }
+	// 軌道方向角算出
+	arma::vec theta = arma::atan2(dy, dx);
+	angle = theta;
+
+	// 軌道曲率算出
+	arma::vec kappa(dx2.size(), arma::fill::zeros);
+	for (int i = 0; i < kappa.size(); i++)
+	{
+		kappa(i) = (dx(i) * dy2(i) - dy(i) * dx2(i)) / std::pow(dx(i) * dx(i) + dy(i) * dy(i), 3.0 / 2.0);
+	}
+	curvature = kappa;
+
+	// 累積距離
+	arma::vec s(dx.size(), arma::fill::zeros);
+	for (int i = 1; i < s.size(); i++)
+	{
+		s(i) = s(i - 1) + sqrt(dx(i) * dx(i) + dy(i) * dy(i));
+	}
+	length = s;
+
+	// std::cout<<theta<<std::endl;
+	// std::cout<<kappa<<std::endl;
+	// std::cout<<length<<std::endl;
+
+	return;
+}
+
+// 参照パラメータ計算
+void Controller::CalcReferenceParams(const double xk, const double yk)
+{
+	// 目標軌道の最近傍点を探索
+	NNS(xp, yp, xk, yk, outNNS);
+
+	// 最近傍点補間IDXから目標軌道の方向角/曲率/累積距離/座標を補間
+	arma::vec t = arma::regspace(0, xp.size() - 1);
+	arma::vec x_interp(1), y_interp(1);
+	arma::vec kappa_interp(1), theta_interp(1), s_interp(1);
+	arma::vec t_search(1);
+	t_search(0) = outNNS(1);
+	arma::interp1(t, angle, t_search, theta_interp);
+	arma::interp1(t, curvature, t_search, kappa_interp);
+	arma::interp1(t, length, t_search, s_interp);
+	arma::interp1(t, xp, t_search, x_interp);
+	arma::interp1(t, yp, t_search, y_interp);
+
+	// 出力セット
+	ref_param(0) = outNNS(0);
+	ref_param(1) = theta_interp(0);
+	ref_param(2) = kappa_interp(0);
+	ref_param(3) = s_interp(0);
+	ref_param(4) = x_interp(0);
+	ref_param(5) = y_interp(0);
+
+	// std::cout << outNNS(1) << std::endl;
+	// std::cout << ref_param << std::endl;
+
+	return;
+}
 
 // 制御入力計算関数
 // x = [posx, posy, theta]^T
