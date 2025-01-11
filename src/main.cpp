@@ -17,13 +17,14 @@
 #include "controller.h"
 #include "plant_model.h"
 
-#include "FilterCCF.h"
+#include "filterCCF.h"
 
 // 暫定のデバッグ用グローバル変数（注意）
 double g_dbg_info[15] = {0.};
 
 // 関数プロトタイプ宣言
 int python_graph_plotter(std::string);
+void NNS(arma::vec, arma::vec, double, double, Eigen::VectorXd &);
 
 // ユーザー設定取得部
 void GetUserSetting(int &user_mode, std::vector<double> &user_param)
@@ -180,4 +181,11 @@ int main(void)
 	// 	ofs << filter_output[0] << ",";
 	// 	ofs << filter_output[1] << std::endl;
 	// }
+
+	// // 最近傍点探索動作チェック
+	// arma::vec xp = arma::regspace(0, 0.1, 10);
+	// arma::vec yp = arma::sin(xp) * 5.0;
+	// Eigen::VectorXd outNNS = Eigen::VectorXd::Zero(5);
+	// NNS(xp, yp, 4.05, 1.2, outNNS);
+	// std::cout << outNNS << std::endl;
 }

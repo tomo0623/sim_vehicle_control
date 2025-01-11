@@ -10,7 +10,7 @@
 #include "Eigen/Dense"
 #include "param.h"
 
-#include "FilterCCF.h"
+#include "filterCCF.h"
 
 //
 enum CtrlMode

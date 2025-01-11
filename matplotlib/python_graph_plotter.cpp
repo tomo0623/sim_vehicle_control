@@ -40,6 +40,13 @@ vector2matrix(const std ::vector<std ::vector<S>> &in)
         t.insert(t.end(), i.begin(), i.end());
     }
     return (Eigen ::Map<Eigen ::Matrix<S, Eigen ::Dynamic, Eigen ::Dynamic>>(&t[0], y, x)).transpose();
+
+    /*
+    // vectorにコピー
+	Eigen::VectorXd eig_a = Eigen::VectorXd::Zero(5);
+	std::vector<double> a(5);
+	memcpy(&a, &eig_a(0), sizeof(double)*eig_a.size());
+    */
 }
 
 // グラフプロット関数
