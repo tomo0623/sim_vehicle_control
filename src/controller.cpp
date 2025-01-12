@@ -28,7 +28,8 @@ void Controller::PseudoPlanner()
 	if(0)
 	{
 		// 関数で生成
-		xp = arma::regspace(0, 5, 2000);
+		xp = arma::regspace(0, 1, 2000);
+		// xp = arma::regspace(0, 1, 100);
 		// yp = arma::ones(size(xp)) * 5.0; // 直線軌道
 		yp = arma::sin(xp / 20 - 0) * 5.0 - 5.0; // sinカーブ軌道
 	}
@@ -36,7 +37,7 @@ void Controller::PseudoPlanner()
 	{
 		// CSV読み込み
 		std::vector<std::vector<double>> data;
-		std::ifstream ifs("../src/ref_trajectory.csv");
+		std::ifstream ifs("../src/ref_trajectory2.csv");
 
 		if (ifs)
 		{

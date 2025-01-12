@@ -84,7 +84,7 @@ void NNS(arma::vec xp, arma::vec yp, double xk, double yk, Eigen::VectorXd &outN
     std::vector<double> x0 = std::vector<double>{search_idx0};
 
     // 探索処理
-    std::vector<double> xopt = nelder_mead::find_min(objective_func, x0, false, {}, 0.1, 0.1);
+    std::vector<double> xopt = nelder_mead::find_min(objective_func, x0, false, {}, 0.001, 0.1);
     // std::cout << "x0 : " << x0[0] <<  std::endl;
     // std::cout << "xopt : " << xopt[0] <<  std::endl;
 

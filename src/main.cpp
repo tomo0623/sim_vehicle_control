@@ -145,8 +145,11 @@ void Simulator(Method f, OEQ h, std::string filename)
 		{
 			ofs << std::scientific << std::setprecision(15) << tmp << ",";
 		}
-
 		ofs << std::endl;
+
+		// // デバッグ：軌道ロギング
+		// if (i % 10 == 0)
+		// ofs << std::scientific << std::setprecision(15) << x(0) << ","<< x(1)<< std::endl;
 
 		// progress
 		if (i % 500 == 0)
@@ -196,8 +199,7 @@ int main(void)
 	// Controller Ctrl;
 	// Ctrl.PseudoPlanner();
 	// Ctrl.CalcTrajectoryParams();
-	// Ctrl.CalcReferenceParams(51.4177620145334, -5.86232774266377);
-
+	// // Ctrl.CalcReferenceParams(51.4177620145334, -5.86232774266377);
 
 	// std::ofstream ofs("plan-ctrl_test.csv");
 	// for (int i = 0; i < Ctrl.xp.size(); i++)
