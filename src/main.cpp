@@ -29,9 +29,9 @@ int python_graph_plotter(std::string);
 void GetUserSetting(int &user_mode, std::vector<double> &user_param)
 {
 	// 制御モード取得
-	std::cout << "制御モード選択 -> 0:PID-直線追従, 1:PID-SIN追従, 2:TSCF-直線追従, 3:TSCF-SIN追従" << std::endl;
+	std::cout << "制御モード選択 -> 0:PID-直線追従, 1:PID-SIN追従, 2:TSCF-直線追従, 3:TSCF-SIN追従, 4:TSCF-時間軸：走行距離版" << std::endl;
 	std::cin >> user_mode;
-	while (std::cin.fail() || user_mode < 0 || user_mode > 3)
+	while (std::cin.fail() || user_mode < 0 || user_mode > 4)
 	{
 		if (std::cin.fail())
 		{
@@ -80,7 +80,7 @@ void GetUserSetting(int &user_mode, std::vector<double> &user_param)
 // シミュレーション処理メイン部
 // x = [posx, posy, theta]^T
 // u = [delta, ref_posx, ref_posy, tracking_error]^T
-// y = [posx, posy, theta, vx, vy, gamma]^T
+// y = [posx, posy, theta, vx, vy, gamma, V]^T
 template <class Method, class OEQ>
 void Simulator(Method f, OEQ h, std::string filename)
 {
@@ -96,9 +96,11 @@ void Simulator(Method f, OEQ h, std::string filename)
 	Eigen::VectorXd y = Eigen::VectorXd::Zero(kNumOutputY);
 
 	// CUIで制御設定変更
-	int user_mode = 0;
-	std::vector<double> user_param(2);
-	GetUserSetting(user_mode, user_param);
+	int user_mode = 4;
+	// std::vector<double> user_param(2);
+	std::vector<double> user_param = {0.2, 1.0};
+
+	// GetUserSetting(user_mode, user_param);
 
 	// 制御器クラス
 	Controller Ctrl(u, static_cast<CtrlMode>(user_mode), user_param);
@@ -145,6 +147,12 @@ void Simulator(Method f, OEQ h, std::string filename)
 		}
 
 		ofs << std::endl;
+
+		// progress
+		if (i % 500 == 0)
+		{
+			std::cout << "進捗："<< i/kNumMaxSimCount*100 << " [%]"<<std::endl;;
+		}
 	}
 }
 
@@ -188,7 +196,8 @@ int main(void)
 	// Controller Ctrl;
 	// Ctrl.PseudoPlanner();
 	// Ctrl.CalcTrajectoryParams();
-	// Ctrl.CalcReferenceParams(40.05, 1.2);
+	// Ctrl.CalcReferenceParams(51.4177620145334, -5.86232774266377);
+
 
 	// std::ofstream ofs("plan-ctrl_test.csv");
 	// for (int i = 0; i < Ctrl.xp.size(); i++)

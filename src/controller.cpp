@@ -176,7 +176,7 @@ void Controller::CalcReferenceParams(const double xk, const double yk)
 // 制御入力計算関数
 // x = [posx, posy, theta]^T
 // u = [delta, ref_posx, ref_posy, tracking_error]^T
-// y = [posx, posy, theta, vx, vy, gamma]^T
+// y = [posx, posy, theta, vx, vy, gamma, V]^T
 Eigen::VectorXd Controller::CalcCtrlInput(double t, Eigen::VectorXd y)
 {
 
@@ -236,6 +236,92 @@ Eigen::VectorXd Controller::CalcCtrlInput(double t, Eigen::VectorXd y)
 	g_dbg_info[2] = 0.;
 	g_dbg_info[3] = 0.;
 	g_dbg_info[4] = 0.;
+	g_dbg_info[5] = 0.;
+	g_dbg_info[6] = 0.;
+	g_dbg_info[7] = 0.;
+	g_dbg_info[8] = 0.;
+	g_dbg_info[9] = 0.;
+	g_dbg_info[10] = 0.;
+	g_dbg_info[11] = 0.;
+	g_dbg_info[12] = 0.;
+	g_dbg_info[13] = 0.;
+	g_dbg_info[14] = 0.;
+
+	// std::cout<<"control : " << t <<std::endl;
+	// std::cout<<u<<std::endl;
+	return u;
+
+	// u(0) = (cos(t/2)*kLimSteerAngle/3)*sin(t/5); // ダミー軌道生成用
+}
+
+// 制御入力計算関数(状態量s：走行距離に関する運動学モデルベースのTSCF)
+// x = [posx, posy, theta]^T
+// u = [delta, ref_posx, ref_posy, tracking_error]^T
+// y = [posx, posy, theta, vx, vy, gamma, V]^T
+Eigen::VectorXd Controller::CalcCtrlInputTSCF_by_s(double t, Eigen::VectorXd y)
+{
+	// 制御パラメータ
+	double omega = ctrl_param(0);
+	double zeta = ctrl_param(1);
+	double f1 = 2.0 * zeta * omega;
+	double f2 = omega * omega;
+
+	// 最近傍探索処理, 参照パラメータ計算
+	CalcReferenceParams(y(0), y(1));
+	
+	// フィードバック入力計算
+	double ref_theta, ref_kappa;
+	double dzds, mu;
+	double cos_diff_theta, err_ref_kappa;
+
+	ref_theta = ref_param(1);
+	ref_kappa = ref_param(2);
+
+	dzds = -sin(ref_theta-y(2));
+	mu = -f1*dzds-f2*ref_param(0);
+	cos_diff_theta = cos(ref_theta-y(2));
+	err_ref_kappa = (1.0 - ref_param(0)*ref_kappa);
+
+	// 特異点回避用
+	double thld_cos_diff_theta = 0.01;
+    double thld_err_ref_kappa = 0.01;
+
+	if(cos_diff_theta<0 && cos_diff_theta > -thld_cos_diff_theta)
+	{
+		cos_diff_theta = -thld_cos_diff_theta;
+	}
+	else if(cos_diff_theta>=0 && cos_diff_theta < thld_cos_diff_theta)
+	{
+		cos_diff_theta = thld_cos_diff_theta;
+	}
+
+	if(err_ref_kappa<0 && err_ref_kappa > -thld_err_ref_kappa)
+	{
+		err_ref_kappa = -thld_err_ref_kappa;
+	}
+	else if(err_ref_kappa>=0 && err_ref_kappa < thld_err_ref_kappa)
+	{
+		err_ref_kappa = thld_err_ref_kappa;
+	}
+
+	// 操舵角計算
+	double term1, term2, delta;
+	term1 = mu*kWheelBase/cos_diff_theta;
+	term2 = kWheelBase*ref_kappa/err_ref_kappa*cos_diff_theta;
+	delta = atan2((term1+term2),1.0);
+
+	// 出力セット
+	u(0) = delta;
+	u(1) = ref_param(4); // ref_x
+	u(2) = ref_param(5); // ref_y
+	u(3) = ref_param(0); // error
+
+	// デバッグ情報の仮取得
+	g_dbg_info[0] = outNNS(1);
+	g_dbg_info[1] = ref_theta;
+	g_dbg_info[2] = ref_kappa;
+	g_dbg_info[3] = cos_diff_theta;
+	g_dbg_info[4] = err_ref_kappa;
 	g_dbg_info[5] = 0.;
 	g_dbg_info[6] = 0.;
 	g_dbg_info[7] = 0.;

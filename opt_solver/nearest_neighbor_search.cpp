@@ -35,11 +35,20 @@ double objective_func(const std::vector<double> &xopt)
     arma::vec t_search(1);
 
     t_search(0) = xopt[0];
-    arma::interp1(t, g_ObjParam.xp, t_search, x_interp);
-    arma::interp1(t, g_ObjParam.yp, t_search, y_interp);
+    arma::interp1(t, g_ObjParam.xp, t_search, x_interp, "linear", 0.0);
+    arma::interp1(t, g_ObjParam.yp, t_search, y_interp, "linear", 0.0);
 
     // ノルム誤差
     res = pow(x_interp(0) - g_ObjParam.xk, 2) + pow(y_interp(0) - g_ObjParam.yk, 2);
+    // ペナルティ
+    if(xopt[0] < 1.0)
+    {
+        res = res + 10000.0;
+    }
+    if(xopt[0] > g_ObjParam.xp.size() - 2.0)
+    {
+        res = res + 10000.0;
+    }
 
     // ステップモニター
     // std::cout << "objective_func : " << res << std::endl;
@@ -60,7 +69,7 @@ void NNS(arma::vec xp, arma::vec yp, double xk, double yk, Eigen::VectorXd &outN
     g_ObjParam.yk = yk;
 
     // 探索初期IDXを設定
-    static double search_idx0 = 0.01;
+    static double search_idx0 = 0.1;
     if(0)
     {
         // X座標をベースに探索初期値(浮動小数IDX)を設定
@@ -75,7 +84,7 @@ void NNS(arma::vec xp, arma::vec yp, double xk, double yk, Eigen::VectorXd &outN
     std::vector<double> x0 = std::vector<double>{search_idx0};
 
     // 探索処理
-    std::vector<double> xopt = nelder_mead::find_min(objective_func, x0, false, {}, 0.001, 0.001);
+    std::vector<double> xopt = nelder_mead::find_min(objective_func, x0, false, {}, 0.1, 0.1);
     // std::cout << "x0 : " << x0[0] <<  std::endl;
     // std::cout << "xopt : " << xopt[0] <<  std::endl;
 
@@ -83,7 +92,17 @@ void NNS(arma::vec xp, arma::vec yp, double xk, double yk, Eigen::VectorXd &outN
     arma::vec t = arma::regspace(0, g_ObjParam.xp.size() - 1);
     arma::vec x_interp(1), y_interp(1);
     arma::vec t_search(1);
+
+    if(xopt[0] < 0.1)
+    {
+        xopt[0] = 0.1;
+    }
+    if(xopt[0] > g_ObjParam.xp.size()-1.1)
+    {
+        xopt[0] = g_ObjParam.xp.size()-1.1;
+    }
     t_search(0) = double(xopt[0]);
+    
     arma::interp1(t, g_ObjParam.xp, t_search, x_interp);
     arma::interp1(t, g_ObjParam.yp, t_search, y_interp);
     // std::cout << x_interp(0) <<  std::endl;
@@ -118,7 +137,7 @@ void NNS(arma::vec xp, arma::vec yp, double xk, double yk, Eigen::VectorXd &outN
 
     // 最近傍補間距離
     dist = sqrt(pow(x_interp(0) - g_ObjParam.xk, 2) + pow(y_interp(0) - g_ObjParam.yk, 2));
-    dist = dist * arma::sign(dist);
+    dist = dist * arma::sign(cond_cross);
     // std::cout << dist <<  std::endl;
 
     // 出力セット

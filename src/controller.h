@@ -26,6 +26,7 @@ class Controller
 {
 private:
 	Eigen::VectorXd CalcCtrlInput(double t, Eigen::VectorXd); // 制御入力計算関数
+	Eigen::VectorXd CalcCtrlInputTSCF_by_s(double t, Eigen::VectorXd); // 制御入力計算関数
 
 public:
 	Eigen::Vector2d ctrl_param = Eigen::VectorXd::Zero(2); // 制御パラメータ
@@ -52,6 +53,10 @@ public:
 		// ctrl_param(0) = 0.0001; // PID仮調整
 		// ctrl_param(1) = 0.01; // PID仮調整
 		std::cout << "ctrl param : " << ctrl_param.transpose() << std::endl;
+
+		// 疑似プランナー・軌道パラメータ計算実行(TSCF-時間軸：走行距離版用処理)
+		PseudoPlanner();
+		CalcTrajectoryParams();
 	}
 	Controller()
 	{
@@ -60,7 +65,15 @@ public:
 	// 関数オブジェクト
 	Eigen::VectorXd operator()(double t, Eigen::VectorXd y)
 	{
-		return CalcCtrlInput(t, y); // 制御計算
+		if(mode<4)
+		{
+			return CalcCtrlInput(t, y); // 制御計算(教材用)
+		}
+		else
+		{
+			return CalcCtrlInputTSCF_by_s(t, y); // 制御計算(状態量s：走行距離に関する運動学モデルベースのTSCF)
+		}
+		
 	}
 
 	// 制御入力モニタ
