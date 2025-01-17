@@ -24,15 +24,14 @@ double g_dbg_info[15] = {0.};
 
 // 関数プロトタイプ宣言
 int python_graph_plotter(std::string);
-void NNS(arma::vec, arma::vec, double, double, Eigen::VectorXd &);
 
 // ユーザー設定取得部
 void GetUserSetting(int &user_mode, std::vector<double> &user_param)
 {
 	// 制御モード取得
-	std::cout << "制御モード選択 -> 0:PID-直線追従, 1:PID-SIN追従, 2:TSCF-直線追従, 3:TSCF-SIN追従" << std::endl;
+	std::cout << "制御モード選択 -> 0:PID-直線追従, 1:PID-SIN追従, 2:TSCF-直線追従, 3:TSCF-SIN追従, 4:TSCF-時間軸：走行距離版" << std::endl;
 	std::cin >> user_mode;
-	while (std::cin.fail() || user_mode < 0 || user_mode > 3)
+	while (std::cin.fail() || user_mode < 0 || user_mode > 4)
 	{
 		if (std::cin.fail())
 		{
@@ -81,7 +80,7 @@ void GetUserSetting(int &user_mode, std::vector<double> &user_param)
 // シミュレーション処理メイン部
 // x = [posx, posy, theta]^T
 // u = [delta, ref_posx, ref_posy, tracking_error]^T
-// y = [posx, posy, theta, vx, vy, gamma]^T
+// y = [posx, posy, theta, vx, vy, gamma, V]^T
 template <class Method, class OEQ>
 void Simulator(Method f, OEQ h, std::string filename)
 {
@@ -97,8 +96,10 @@ void Simulator(Method f, OEQ h, std::string filename)
 	Eigen::VectorXd y = Eigen::VectorXd::Zero(kNumOutputY);
 
 	// CUIで制御設定変更
-	int user_mode = 0;
-	std::vector<double> user_param(2);
+	int user_mode = 4; // 動確用にTSCF-時間軸：走行距離版をデフォルト設定
+	// std::vector<double> user_param(2);
+	std::vector<double> user_param = {0.2, 1.0}; // 動確用にTSCF-時間軸：走行距離版をデフォルト設定
+
 	GetUserSetting(user_mode, user_param);
 
 	// 制御器クラス
@@ -144,8 +145,17 @@ void Simulator(Method f, OEQ h, std::string filename)
 		{
 			ofs << std::scientific << std::setprecision(15) << tmp << ",";
 		}
-
 		ofs << std::endl;
+
+		// // デバッグ：軌道ロギング
+		// if (i % 10 == 0)
+		// ofs << std::scientific << std::setprecision(15) << x(0) << ","<< x(1)<< std::endl;
+
+		// progress
+		if (i % 500 == 0)
+		{
+			std::cout << "進捗："<< i/kNumMaxSimCount*100 << " [%]"<<std::endl;;
+		}
 	}
 }
 
@@ -163,10 +173,6 @@ int main(void)
 	python_graph_plotter(filename);
 
 	std::cout << "全処理完了" << std::endl;
-
-	// 疑似プランナー動作チェック
-	// Controller Ctrl;
-	// Ctrl.PseudoPlanner();
 
 	// // フィルタ動作チェック
 	// FilterCCF ADF(0.05, 0.02, 0.01);
@@ -188,4 +194,22 @@ int main(void)
 	// Eigen::VectorXd outNNS = Eigen::VectorXd::Zero(5);
 	// NNS(xp, yp, 4.05, 1.2, outNNS);
 	// std::cout << outNNS << std::endl;
+
+	// // 疑似プランナー -> 軌道&参照パラメータ計算の動作チェック
+	// Controller Ctrl;
+	// Ctrl.PseudoPlanner();
+	// Ctrl.CalcTrajectoryParams();
+	// // Ctrl.CalcReferenceParams(51.4177620145334, -5.86232774266377);
+
+	// std::ofstream ofs("plan-ctrl_test.csv");
+	// for (int i = 0; i < Ctrl.xp.size(); i++)
+	// {
+	// 	ofs << Ctrl.xp(i) << ",";
+	// 	ofs << Ctrl.yp(i) << ",";
+	// 	ofs << Ctrl.length(i) << ",";
+	// 	ofs << Ctrl.angle(i) << ",";
+	// 	ofs << Ctrl.curvature(i) << std::endl;
+	// }
+
+	return 0;
 }

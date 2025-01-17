@@ -14,7 +14,7 @@ VehicleModel car;
 // 状態方程式計算関数
 // x = [posx, posy, theta]^T
 // u = [delta, ref_posx, ref_posy, tracking_error]^T
-// y = [posx, posy, theta, vx, vy, gamma]^T
+// y = [posx, posy, theta, vx, vy, gamma, V]^T
 Eigen::VectorXd Dynamics::StateEquation::CalcSEQ(double t, Eigen::VectorXd x, Eigen::VectorXd u)
 {
     Eigen::VectorXd dx(kNumStateX);
@@ -44,7 +44,7 @@ Eigen::VectorXd Dynamics::StateEquation::CalcSEQ(double t, Eigen::VectorXd x, Ei
 // 出力方程式計算関数
 // x = [posx, posy, theta]^T
 // u = [delta, ref_posx, ref_posy, tracking_error]^T
-// y = [posx, posy, theta, vx, vy, gamma]^T
+// y = [posx, posy, theta, vx, vy, gamma, V]^T
 Eigen::VectorXd Dynamics::OutputEquation::CalcOEQ(double t, Eigen::VectorXd x, Eigen::VectorXd u)
 {
     Eigen::VectorXd y = Eigen::VectorXd::Zero(kNumOutputY);
