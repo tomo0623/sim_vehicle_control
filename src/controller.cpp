@@ -65,6 +65,7 @@ void Controller::PseudoPlanner()
 		// armadilloベクトルに変換
 		xp = arma::vec(data_matrix.col(0).data(), data_matrix.rows(), true, false);
 		yp = arma::vec(data_matrix.col(1).data(), data_matrix.rows(), true, false);
+		yp = yp + 5.0; // 初期座標からずらすため全体オフセット
 	}
 	
 	// std::cout<<xp<<std::endl;
