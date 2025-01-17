@@ -96,11 +96,11 @@ void Simulator(Method f, OEQ h, std::string filename)
 	Eigen::VectorXd y = Eigen::VectorXd::Zero(kNumOutputY);
 
 	// CUIで制御設定変更
-	int user_mode = 4;
+	int user_mode = 4; // 動確用にTSCF-時間軸：走行距離版をデフォルト設定
 	// std::vector<double> user_param(2);
-	std::vector<double> user_param = {0.2, 1.0};
+	std::vector<double> user_param = {0.2, 1.0}; // 動確用にTSCF-時間軸：走行距離版をデフォルト設定
 
-	// GetUserSetting(user_mode, user_param);
+	GetUserSetting(user_mode, user_param);
 
 	// 制御器クラス
 	Controller Ctrl(u, static_cast<CtrlMode>(user_mode), user_param);
